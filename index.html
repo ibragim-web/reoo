@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RusKlick</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #000428, #004e92);
+            color: #FFD700;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #container {
+            position: relative;
+            z-index: 2;
+            padding-top: 50px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin: 0;
+            padding: 20px 0;
+        }
+
+        button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 15px;
+            border: none;
+            background-color: #FFD700;
+            color: #000;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #clicker {
+            margin: 20px auto;
+            padding: 50px;
+            border-radius: 50%;
+            background-color: #FFD700;
+            color: #000;
+            font-size: 2em;
+            cursor: pointer;
+            display: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        #clicker:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #minigame, #shop, #inviteFriends {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: #FFD700;
+            border-radius: 50%;
+            animation: fall 5s linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) translateX(calc(100vw - 50%));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>RusKlick</h1>
+        <button id="startButton">Старт</button>
+        <button id="shopButton" style="display:none;">Магазин</button>
+        <button id="inviteButton" style="display:none;">Пригласить друзей</button>
+        <div id="clicker">Майнится...</div>
+        <div id="minigame">
+            <p>Мини-игра: Нажмите на кнопку, чтобы заработать очки!</p>
+            <button id="minigameButton">Нажми меня!</button>
+            <p>Очки: <span id="points">0</span></p>
+        </div>
+        <div id="shop">
+            <p>Магазин:</p>
+            <!-- Добавьте товары для покупки -->
+        </div>
+        <div id="inviteFriends">
+            <p>Пригласить друзей:</p>
+            <!-- Добавьте функционал для приглашения друзей -->
+        </div>
+    </div>
+    <script>
+        let mining = false;
+        let startTime;
+        let points = 0;
+        let gameCount = 0;
+
+        const startButton = document.getElementById('startButton');
+        const clicker = document.getElementById('clicker');
+        const minigameButton = document.getElementById('minigameButton');
+        const pointsDisplay = document.getElementById('points');
+        const minigame = document.getElementById('minigame');
+        const shopButton = document.getElementById('shopButton');
+        const inviteButton = document.getElementById('inviteButton');
+        const shop = document.getElementById('shop');
+        const inviteFriends = document.getElementById('inviteFriends');
+
+        startButton.onclick = function() {
+            startMining();
+        };
+
+        shopButton.onclick = function() {
+            shop.style.display = shop.style.display === 'none' ? 'block' : 'none';
+        };
+
+        inviteButton.onclick = function() {
+            inviteFriends.style.display = inviteFriends.style.display === 'none' ? 'block' : 'none';
+        };
+
+        minigameButton.onclick = function() {
+            if (gameCount < 3) {
+                points++;
+                pointsDisplay.textContent = points;
+                gameCount++;
+            } else {
+                alert('Вы исчерпали количество игр.');
+                minigameButton.disabled = true;
+            }
+        };
+
+        function startMining() {
+            mining = true;
+            startTime = Date.now();
+            startButton.style.display = 'none';
+            clicker.style.display = 'block';
+
+            const miningInterval = setInterval(function() {
+                const elapsedTime = Date.now() - startTime;
+                const elapsedSeconds = Math.floor(elapsedTime / 1000);
+
+                if (elapsedSeconds >= 7200) { // 2 hours
+                    clearInterval(miningInterval);
+                    miningComplete();
+                } else {
+                    clicker.textContent = `Майнится... ${elapsedSeconds}s / 7200s`;
+                }
+            }, 1000);
+        }
+
+        function miningComplete() {
+            mining = false;
+            clicker.style.display = 'none';
+            minigame.style.display = 'block';
+            shopButton.style.display = 'block';
+            inviteButton.style.display = 'block';
+            alert('Майнинг завершен! Теперь вы можете играть в мини-игру.');
+        }
+
+        function createParticles() {
+            setInterval(function() {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * window.innerWidth + 'px';
+                document.body.appendChild(particle);
+
+                setTimeout(function() {
+                    particle.remove();
+                }, 5000);
+            }, 200);
+        }
+
+        createParticles();
+    </script>
+</body>
+</html>
